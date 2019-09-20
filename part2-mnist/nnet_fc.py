@@ -39,9 +39,9 @@ def main():
     #################################
     ## Model specification TODO
     model = nn.Sequential(
-              nn.Linear(784, 10),
-              nn.ReLU(),
-              nn.Linear(10, 10),
+              nn.Linear(784, 128),
+              nn.LeakyReLU(negative_slope = 0.01),
+              nn.Linear(128, 10),
             )
     lr=0.1
     momentum=0
@@ -60,3 +60,15 @@ if __name__ == '__main__':
     np.random.seed(12321)  # for reproducibility
     torch.manual_seed(12321)  # for reproducibility
     main()
+    ## baseline :  0.9204727564102564    0.932487
+    ## batch size 64 : 0.9314903846153846    0.940020
+    ## lr = 0.01 : 0.9206730769230769    0.934492
+    ## momentum = 0.9 : 0.8828125        0.895722
+    ## LeakyRelu : 0.9207732371794872   0.931985
+
+    ## hidden 10 -> 128 units
+    ## baseline : 0.9767628205128205    0.977440
+    ## batch size 64 : 0.9745592948717948    0.976983
+    ## lr = 0.01 : 0.9427083333333334    0.955047
+    ## momentum = 0.9 : 0.9596354166666666    0.963402
+    ## LeakyRelu : 0.9771634615384616    0.978777
