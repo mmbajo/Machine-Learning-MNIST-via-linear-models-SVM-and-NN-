@@ -16,12 +16,14 @@ import math
 #pragma: coderesponse template
 def rectified_linear_unit(x):
     """ Returns the ReLU of x, or the maximum between 0 and x."""
+    return max(0, x)
     # TODO
 #pragma: coderesponse end
 
 #pragma: coderesponse template
 def rectified_linear_unit_derivative(x):
     """ Returns the derivative of ReLU."""
+    return int(min(max(0, x), 1))
     # TODO
 #pragma: coderesponse end
 
@@ -60,26 +62,26 @@ class NeuralNetwork():
         input_values = np.matrix([[x1],[x2]]) # 2 by 1
 
         # Calculate the input and activation of the hidden layer
-        hidden_layer_weighted_input = # TODO (3 by 1 matrix)
-        hidden_layer_activation = # TODO (3 by 1 matrix)
+        hidden_layer_weighted_input = np.matmul(self.input_to_hidden_weights, input_values) + self.biases # TODO (3 by 1 matrix)
+        hidden_layer_activation = np.vectorize(rectified_linear_unit)(hidden_layer_weighted_input) # TODO (3 by 1 matrix)
 
-        output =  # TODO
-        activated_output = # TODO
+        output =  np.matmul(self.hidden_to_output_weights, hidden_layer_activation) # TODO (1 by 1 matrix)
+        activated_output = np.vectorize(output_layer_activation)(output) # TODO (1 by 1 matrix)
 
         ### Backpropagation ###
 
         # Compute gradients
-        output_layer_error = # TODO
-        hidden_layer_error = # TODO (3 by 1 matrix)
+        output_layer_error = -(y - activated_output) *  np.vectorize(output_layer_activation_derivative)(output) # TODO (1 by 1 matrix)
+        hidden_layer_error = np.multiply(np.matmul(self.hidden_to_output_weights.T, output_layer_error), np.vectorize(rectified_linear_unit_derivative)(hidden_layer_weighted_input)) # TODO (3 by 1 matrix)
 
-        bias_gradients = # TODO
-        hidden_to_output_weight_gradients = # TODO
-        input_to_hidden_weight_gradients = # TODO
+        bias_gradients = hidden_layer_error # TODO (3 by 1 matrix)
+        hidden_to_output_weight_gradients = np.matmul(output_layer_error, hidden_layer_activation.T) # TODO (1 by 3 matrix)
+        input_to_hidden_weight_gradients = np.matmul(hidden_layer_error, input_values.T) # TODO (3 by 2 matrix)
 
         # Use gradients to adjust weights and biases using gradient descent
-        self.biases = # TODO
-        self.input_to_hidden_weights = # TODO
-        self.hidden_to_output_weights = # TODO
+        self.biases = self.biases.astype('float64') - self.learning_rate * bias_gradients # TODO
+        self.input_to_hidden_weights = self.input_to_hidden_weights.astype('float64') - self.learning_rate * input_to_hidden_weight_gradients # TODO
+        self.hidden_to_output_weights = self.hidden_to_output_weights.astype('float64') - self.learning_rate * hidden_to_output_weight_gradients # TODO
 #pragma: coderesponse end
 
 #pragma: coderesponse template prefix="class NeuralNetwork(NeuralNetworkBase):\n\n"
@@ -88,10 +90,10 @@ class NeuralNetwork():
         input_values = np.matrix([[x1],[x2]])
 
         # Compute output for a single input(should be same as the forward propagation in training)
-        hidden_layer_weighted_input = # TODO
-        hidden_layer_activation = # TODO
-        output = # TODO
-        activated_output = # TODO
+        hidden_layer_weighted_input = np.matmul(self.input_to_hidden_weights, input_values) + self.biases # TODO
+        hidden_layer_activation = np.vectorize(rectified_linear_unit)(hidden_layer_weighted_input)# TODO
+        output = np.matmul(self.hidden_to_output_weights, hidden_layer_activation)# TODO
+        activated_output = np.vectorize(output_layer_activation)(output)# TODO
 
         return activated_output.item()
 #pragma: coderesponse end
@@ -119,4 +121,4 @@ x = NeuralNetwork()
 x.train_neural_network()
 
 # UNCOMMENT THE LINE BELOW TO TEST YOUR NEURAL NETWORK
-# x.test_neural_network()
+x.test_neural_network()
