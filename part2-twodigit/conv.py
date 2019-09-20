@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from train_utils import batchify_data, run_epoch, train_model, Flatten
 import utils_multiMNIST as U
+#torch.set_default_tensor_type('torch.cuda.FloatTensor')
 path_to_data_dir = '../Datasets/'
 use_mini_dataset = True
 
@@ -21,9 +22,34 @@ class CNN(nn.Module):
     def __init__(self, input_dimension):
         super(CNN, self).__init__()
         # TODO initialize model layers here
+        self.conv1 = nn.Sequential(
+              nn.Conv2d(1, 32, (3, 3)),
+              nn.ReLU(),
+              nn.MaxPool2d((2, 2)),
+              nn.Conv2d(32, 64, (3, 3)),
+              nn.ReLU(),
+              nn.MaxPool2d((2, 2)),
+              Flatten(),
+              nn.Linear(2880, 128),
+              nn.Dropout(0.5),
+              nn.Linear(128, 10)
+        )
+        self.conv2 = nn.Sequential(
+              nn.Conv2d(1, 32, (3, 3)),
+              nn.ReLU(),
+              nn.MaxPool2d((2, 2)),
+              nn.Conv2d(32, 64, (3, 3)),
+              nn.ReLU(),
+              nn.MaxPool2d((2, 2)),
+              Flatten(),
+              nn.Linear(2880, 128),
+              nn.Dropout(0.5),
+              nn.Linear(128, 10)
+        )
 
     def forward(self, x):
-
+        out_first_digit = self.conv1(x)
+        out_second_digit = self.conv2(x)
         # TODO use model layers to predict the two digits
 
         return out_first_digit, out_second_digit
@@ -53,6 +79,7 @@ def main():
     input_dimension = img_rows * img_cols
     model = CNN(input_dimension) # TODO add proper layers to CNN class above
 
+    
     # Train
     train_model(train_batches, dev_batches, model)
 
